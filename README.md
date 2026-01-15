@@ -240,7 +240,7 @@ def color(r, g, b):
 
 ## 👨‍🎓 Contexte Académique
 
-**Cours**: Développement Web Front-End  
+**Cours**: IOT  
 **Niveau**: [Première année bachelor]  
 **Établissement**: [IIM-Digital School]  
 **Semestre**: [B1]
