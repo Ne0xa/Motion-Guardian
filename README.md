@@ -8,7 +8,7 @@
 
 Ce projet consiste en la création d'un système d'alarme intelligent et connecté, développé pour Raspberry Pi Pico W. Le système utilise un capteur à ultrasons pour détecter les intrusions, déclenche une alarme sonore et lumineuse, et peut être désactivé via un code PIN saisi sur un clavier matriciel. Une interface web permet également de surveiller l'état de l'alarme à distance via WiFi.
 
-> **ℹ️ Note importante** : Ce README et le code du programme seront traduits en anglais le **16 ou 17 janvier 2026**.
+> **ℹ️ Note importante** : Ce README et le code du programme seront traduits en anglais le **16 ou 17 janvier 2026** ainsi que la partie connexion wifi.
 
 ## ✨ Fonctionnalités
 
