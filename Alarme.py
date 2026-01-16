@@ -253,6 +253,13 @@ print("Distance max:", distance_max, "cm")
 print("Code PIN:", CODE_CORRECT)
 print("="*40)
 
+for i in range(10, 0, -1):
+    print(f"Démarrage dans {i} secondes...")
+    utime.sleep(2)
+
+print("\nSysteme d'alarme actif !")
+print("="*40)
+
 derniere_touche = None
 temps_derniere_touche = 0
 distance_actuelle = 0
