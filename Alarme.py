@@ -4,8 +4,8 @@ import network
 import socket
 
 # --- Configuration WiFi ---
-SSID = "YOUR_WIFI_NAME" # Nom du WiFi
-PASSWORD = "YOUR_WIFI_PASSWORD" # mdp du WiFi
+SSID = "iPhone de Benjamin" # Nom du WiFi
+PASSWORD = "trouvelemdp" # mdp du WiFi
 
 # --- Capteur ultrason ---
 trigger = Pin(2, Pin.OUT)
@@ -182,14 +182,15 @@ def activer_buzzer():
 
 def desactiver_buzzer():
     buzzer.duty_u16(0)
-    print("desactiver_buzzer")
+    #print("desactiver_buzzer")
 
 def digiCode():
     for i, row in enumerate(rows):
         row.high()
         for j, col in enumerate(cols):
-            if col.value() == 1:
+            if col.value():
                 row.low()
+                utime.sleep_ms(40)
                 return keys[i][j]
         row.low()
     return None
@@ -246,7 +247,7 @@ s = socket.socket()
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 s.bind(addr)
 s.listen(1)
-s.setblocking(False)
+s.settimeout(0.2)
 
 print(f"Serveur web démarré sur http://{wlan.ifconfig()[0]}")
 print("Distance max:", distance_max, "cm")
@@ -264,12 +265,16 @@ derniere_touche = None
 temps_derniere_touche = 0
 distance_actuelle = 0
 
+dernier_affichage_client = 0
+delai_affichage = 2000     
+
+
 while True:
     distance = distanceMax()
 
     if distance != -1:
         distance_actuelle = distance
-        print("Distance:", round(distance, 1), "cm")
+        #print("Distance:", round(distance, 1), "cm")
 
         # --- Détection d'intrusion ---
         if distance < distance_max and not alarme_active:
@@ -298,17 +303,19 @@ while True:
 
     try:
         client, addr_client = s.accept()
-        print(f"Client connecté depuis {addr_client}")
-        request = client.recv(1024).decode('utf-8')
-
+        temps = utime.ticks_ms()
+        if utime.ticks_diff(temps, dernier_affichage_client) > delai_affichage:
+            print(f"Client connecté depuis {addr_client}")
+            dernier_affichage_client = temps
+        request = client.recv(1024)
+        
         response = webpage(distance_actuelle, distance_max, alarme_active, len(code_saisi))
-        client.send('HTTP/1.1 200 OK\r\n')
-        client.send('Content-Type: text/html\r\n')
-        client.send('Connection: close\r\n\r\n')
-        client.sendall(response)
+        http_response = 'HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n' + response
+        client.send(http_response)
         client.close()
 
     except OSError:
         pass
 
-    utime.sleep_ms(100)
+    utime.sleep_ms(2)
+
