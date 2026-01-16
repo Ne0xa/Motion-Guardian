@@ -1,4 +1,4 @@
-# Système d'Alarme Intelligent - Raspberry Pi Pico
+# Intelligent Alarm System – Raspberry Pi Pico WH
 
 ![Raspberry Pi](https://img.shields.io/badge/Raspberry%20Pi-Pico%20W-A22846?style=for-the-badge&logo=raspberrypi&logoColor=white)
 ![MicroPython](https://img.shields.io/badge/MicroPython-2B2728?style=for-the-badge&logo=micropython&logoColor=white)
@@ -6,245 +6,245 @@
 
 ## 📝 Description du Projet
 
-Ce projet consiste en la création d'un système d'alarme intelligent et connecté, développé pour Raspberry Pi Pico W. Le système utilise un capteur à ultrasons pour détecter les intrusions, déclenche une alarme sonore et lumineuse, et peut être désactivé via un code PIN saisi sur un clavier matriciel. Une interface web permet également de surveiller l'état de l'alarme à distance via WiFi.
-
-> **ℹ️ Note importante** : Ce README et le code du programme seront traduits en anglais le **16 ou 17 janvier 2026** ainsi que la partie connexion wifi.
+This project implements an intelligent and connected alarm system built for the Raspberry Pi Pico W.
+The system uses an ultrasonic sensor to detect intrusions, triggers both sound and light alarms, and can be deactivated using a PIN code entered on a numpad.
+A web interface allows you to remotely monitor the alarm status over WiFi.
 
 ## ✨ Fonctionnalités
 
-- **Détection automatique d'intrusion** par capteur ultrason HC-SR04
-- **Alarme multi-sensorielle** : buzzer piézoélectrique + LED RGB
-- **Authentification sécurisée** via code PIN à 4 chiffres sur clavier matriciel 4x4
-- **Interface web en temps réel** pour monitoring à distance
-- **Indicateurs visuels** : LED verte (veille), LED rouge (alarme active)
-- **Anti-rebond logiciel** pour éviter les saisies multiples
-- **Système de timeout** pour le capteur ultrason
+- **Automatic intrusion detection** using an HC-SR04 ultrasonic sensor
+- **Multi-sensory alarm** : buzzer + RGB LED
+- **Secure authentication** using 4‑digit PIN code on a numpad
+- **Real-time web interface** for remote monitoring
+- **Visual indicators** : green LED (idle), red LED (alarm active)
+- **Software debouncing** to prevent repeated key presses
+- **Timeout system** for ultrasonic sensor
 
-## 🛠️ Technologies Utilisées
+## 🛠️ Technologies Used
 
-| Technologie | Version | Utilisation |
+| Technology | Version | Purpose |
 |-------------|---------|-------------|
-| **MicroPython** | Latest | Firmware et langage de programmation |
-| **Raspberry Pi Pico W** | - | Microcontrôleur avec WiFi intégré |
-| **HTML** | 5 | Interface web de monitoring |
+| **MicroPython** | Latest | Firmware and programming language |
+| **Raspberry Pi Pico W** | - | Microcontroller with integrated WiFi |
+| **HTML** | 5 | Web monitoring interface |
 
-### Composants Matériels
+### Hardware
 
-- **HC-SR04** - Capteur à ultrasons (détection 2-400 cm)
-- **Clavier matriciel 4x4** - Saisie du code PIN
-- **LED RGB** - Indicateurs visuels d'état
-- **Buzzer piézoélectrique** - Alarme sonore
+- **HC-SR04** - Ultrasonic distance sensor (détection 2-400 cm)
+- **Numppad** - PIN code entry
+- **RGB LED** - Visual status indicator
+- **Buzzer** - Sound alarm
 
-### Protocoles et APIs MicroPython
+### MicroPython APIs & Protocols
 
-- **GPIO (General Purpose Input/Output)** - Communication avec composants électroniques
-- **PWM (Pulse Width Modulation)** - Contrôle de l'intensité (buzzer, LEDs)
-- **Socket API** - Serveur HTTP pour interface web
-- **WLAN** - Connexion WiFi 802.11 b/g/n (2.4 GHz)
+- **GPIO (General Purpose Input/Output)** - Hardware communication
+- **PWM (Pulse Width Modulation)** - Buzzer/LED control
+- **Socket API** - HTTP web server
+- **WLAN** - WiFi 802.11 b/g/n (2.4 GHz)
 
-### Bibliothèques Utilisées
+### Libraries Used
 
 ```python
-from machine import Pin, PWM  # Contrôle GPIO et PWM
-import utime                   # Gestion temporelle
-import network                 # Connexion WiFi
-import socket                  # Serveur web HTTP
+from machine import Pin, PWM   # GPIO and PWM control
+import utime                   # Time management
+import network                 # WiFi connection
+import socket                  # HTTP web server
 ```
 
-## 📌 Schéma de Branchement
+## 📌 Wiring Diagram
 
-### Capteur Ultrason HC-SR04
+### HC-SR04 Ultrasonic Sensor
 - **Trigger** → GPIO 2
 - **Echo** → GPIO 3
 - **VCC** → 5V
 - **GND** → GND
 
-### Buzzer Piézoélectrique
+### Buzzer
 - **Signal** → GPIO 15
 - **GND** → GND
 
-### LED RGB
-- **Rouge** → GPIO 16
-- **Vert** → GPIO 17
-- **Bleu** → GPIO 18
-- **GND/VCC** → GND/3.3V (selon type)
+### RGB LED
+- **Red** → GPIO 16
+- **Green** → GPIO 17
+- **Blue** → GPIO 18
+- **GND/VCC** → GND/3.3V (depending on type)
 
-### Clavier Matriciel 4x4
+### Numpad
 
-**Lignes (Rows)**
-- Ligne 1 → GPIO 6
-- Ligne 2 → GPIO 7
-- Ligne 3 → GPIO 8
-- Ligne 4 → GPIO 9
+**Rows**
+- Row 1 → GPIO 6
+- Row 2 → GPIO 7
+- Row 3 → GPIO 8
+- Row 4 → GPIO 9
 
-**Colonnes (Cols)**
-- Colonne 1 → GPIO 10
-- Colonne 2 → GPIO 11
-- Colonne 3 → GPIO 12
-- Colonne 4 → GPIO 13
+**Cols**
+- Column 1 → GPIO 10
+- Column 2 → GPIO 11
+- Column 3 → GPIO 12
+- Column 4 → GPIO 13
 
-## 🚀 Installation et Lancement
+## 🚀 Installation & Launch
 
-### Prérequis
+### Requirements
 
-- Raspberry Pi Pico W
-- MicroPython installé sur le Pico
-- IDE compatible (Thonny, VS Code avec extension Pico, etc.)
-- Tous les composants électroniques listés
+- Raspberry Pi Pico WH
+- MicroPython installed on the Pico
+- Compatible IDE (Thonny, VS Code with Pico extension, etc.)
+- All required electronic components
 
-### Étapes d'installation
+### Installation Steps
 
 ```bash
-# Cloner le repository
+# Clone the repository
 git clone git@github.com:Ne0xa/Motion-Guardian.git
 
-# Naviguer vers le dossier du projet
+# Navigate to the project folder
 cd Motion-Guardian
 ```
 
 ### Configuration
 
-1. Ouvrir le fichier principal dans votre éditeur
-2. Modifier les paramètres de configuration :
+1. Open the main file in your IDE
+2. Adjust configuration parameters:
 
 ```python
-# Code PIN (par défaut : 2704)
-CODE_CORRECT = "2704"
+# Default PIN code
+secret_code = "2704"
 
-# Distance de détection en cm
-distance_max = 20
+# Detection distance in cm
+max_distance = 20
 
-# Identifiants WiFi
-ssid = "VOTRE_NOM_WIFI"
-password = "VOTRE_MOT_DE_PASSE_WIFI"
+# WiFi
+SSID = "YOUR_WIFI_NAME"
+PASSWORD = "YOUR_WIFI_PASSWORD"
 ```
 
-### Lancement
+### Launch
 
-1. Connecter tous les composants selon le schéma de branchement
-2. Téléverser le code sur votre Raspberry Pi Pico W
-3. Ouvrir le moniteur série pour voir l'adresse IP
-4. Le système démarre automatiquement
+1. Connect all components according to the wiring diagram
+2. Upload the code to your Raspberry Pi Pico WH
+3. Open the serial monitor to retrieve the IP address
+4. The system starts automatically
 
-## 💡 Utilisation
+## 💡 Usage
 
-### Fonctionnement Normal
+### Normal Operation
 
-1. **Mode veille** : LED verte allumée, système en attente
-2. **Détection d'intrusion** : 
-   - Objet détecté à moins de 20 cm
-   - LED devient rouge
-   - Buzzer se déclenche
-3. **Désactivation** :
-   - Saisir le code PIN sur le clavier
-   - Appuyer sur `#` pour valider (ou laisser valider automatiquement après 4 chiffres)
-   - Appuyer sur `*` pour effacer
+1. **Idle mode** : green LED on, system ready
+2. **Intrusion detection** : 
+   - Object detected below 20 cm
+   - LED turns red
+   - Buzzer activates
+3. **Deactivation** :
+   - Enter the PIN code on the numpad
+   - Press # to validate (or wait for auto-validation after 4 digits)
+   - Press * to clear current input
 
-### Interface Web
+### Web Interface
 
-Une fois connecté au WiFi, accédez à l'adresse IP affichée dans la console :
+Once connected to WiFi, open the displayed IP address:
 ```
-http://[ADRESSE_IP_DU_PICO]
+http://[PICO_IP_ADDRESS]
 ```
 
-L'interface affiche l'état actuel de l'alarme (ON/OFF).
+The interface shows the current alarm status (ON/OFF).
 
-## 🎯 Caractéristiques Techniques
+## 🎯 Technical Specifications
 
-- **Fréquence PWM** : 1000 Hz (buzzer et LEDs)
-- **Résolution PWM** : 16 bits (0-65535)
-- **Rafraîchissement** : 100 ms (10 Hz)
-- **Timeout capteur** : 30 ms
-- **Anti-rebond clavier** : 300 ms
-- **Port serveur web** : 80 (HTTP)
-- **Portée capteur** : 2-400 cm
-- **Distance de détection** : Configurable (défaut 20 cm)
+- **PWM frequency** : 1000 Hz (buzzer and LEDs)
+- **PWM resolution** : 16 bits (0-65535)
+- **Refresh rate** : 100 ms (10 Hz)
+- **Sensor timeout** : 30 ms
+- **Key debounce** : 300 ms
+- **Web server port** : 80 (HTTP)
+- **Sensor range** : 2-400 cm
+- **Detection distance** : configurable (default 20 cm)
 
-## 🔐 Sécurité
+## 🔐 Security
 
-- ✅ Code PIN à 4 chiffres
-- ✅ Affichage masqué du code (caractères remplacés par `*`)
-- ✅ Réinitialisation automatique après validation
-- ✅ Anti-rebond pour éviter les saisies multiples
+- ✅ 4‑digit PIN code
+- ✅ Masked input (*)
+- ✅ Automatic reset after validation
+- ✅ Key debouncing
 
-⚠️ **Important** : Changez le code PIN par défaut (`2704`) avant utilisation en production
+⚠️ **Important** : Change the default PIN code (2704) before using the system in real situations
 
-## 🛠️ Personnalisation
+## 🛠️ Customization
 
-### Modifier la Distance de Détection
+### Change Detection Distance
 ```python
-distance_max = 30  # Détection à 30 cm au lieu de 20 cm
+max_distance = 30  # Detect at 30 cm instead of 20 cm
 ```
 
-### Changer le Code PIN
+### Change PIN Code
 ```python
-CODE_CORRECT = "1234"  # Votre code personnalisé
+secret_code = "1234"  
 ```
 
-### Ajuster la Fréquence du Buzzer
+### Adjust Buzzer Frequency
 ```python
-buzzer.freq(2000)  # Fréquence de 2000 Hz (son plus aigu)
+buzzer.freq(2000)  # Higher pitch
 ```
 
-### Personnaliser les Couleurs LED
+### Customize LED Colors
 ```python
 def color(r, g, b):
-    red.duty_u16(int(65535 * r))    # Intensité variable (0.0 à 1.0)
+    red.duty_u16(int(65535 * r))
     green.duty_u16(int(65535 * g))
     blue.duty_u16(int(65535 * b))
 ```
 
-## 🐛 Dépannage
+## 🐛  Troubleshooting
 
-| Problème | Solution |
+| Issue | Solution |
 |----------|----------|
-| **Capteur ne détecte rien** | Vérifier connexions Trigger/Echo et alimentation 5V |
-| **WiFi ne se connecte pas** | Vérifier SSID/mot de passe et réseau en 2.4 GHz uniquement |
-| **Clavier ne répond pas** | Vérifier toutes les connexions lignes/colonnes |
-| **Buzzer silencieux** | Vérifier connexion GPIO 15 et polarité |
-| **LED ne s'allume pas** | Vérifier type LED (anode/cathode commune) et connexions |
-| **Erreur timeout capteur** | Réduire timeout ou vérifier obstacles devant capteur |
+| **Sensor not detecting** | Check Trigger/Echo wiring and 5 V power |
+| **WiFi not connecting** | Check SSID/password and ensure 2.4 GHz WiFi |
+| **Numpad not responding** | Verify row/column connections |
+| **Buzzer silent** | Check GPIO 15 wiring |
+| **LED inactive** | Check LED type (common anode/cathode) and wiring |
+| **Sensor timeout error** | Reduce timeout or check obstacles |
 
-## 📊 Structure du Code
+## 📊 Code Structure
 
 ```
-├── Initialisation GPIO
-│   ├── Capteur ultrason (Trigger, Echo)
+├── GPIO Initialization
+│   ├── Ultrasonic sensor (Trigger, Echo)
 │   ├── Buzzer (PWM)
-│   ├── LED RGB (PWM)
-│   └── Clavier matriciel (4x4)
+│   ├── RGB LED (PWM)
+│   └── Numpad (4×4)
 │
-├── Fonctions principales
-│   ├── distanceMax() - Mesure distance ultrason
-│   ├── digiCode() - Lecture clavier matriciel
-│   ├── verifCode() - Vérification code PIN
-│   ├── gereTouche() - Gestion saisie clavier
-│   └── color() - Contrôle LED RGB
+├── Main Functions
+│   ├── maxDistance() – Ultrasonic distance measurement
+│   ├── digitCode() – Keypad reading
+│   ├── verifyCode() – PIN code validation
+│   ├── readKey() – Key handling
+│   └── color() – RGB LED control
 │
-├── Boucle principale
-│   ├── Mesure distance
-│   ├── Détection intrusion
-│   ├── Gestion alarme
-│   └── Saisie code PIN
+├── Main Loop
+│   ├── Distance measurement
+│   ├── Intrusion detection
+│   ├── Alarm handling
+│   └── PIN code input
 │
-└── Serveur Web
-    ├── Connexion WiFi
-    └── Page HTML status
+└── Web Server
+    ├── WiFi connection
+    └── HTML status page
 ```
 
-## 📚 Ressources
+## 📚 Resources
 
 - [Documentation MicroPython](https://docs.micropython.org/)
 - [Raspberry Pi Pico W Datasheet](https://datasheets.raspberrypi.com/picow/pico-w-datasheet.pdf)
 - [HC-SR04 Datasheet](https://cdn.sparkfun.com/datasheets/Sensors/Proximity/HCSR04.pdf)
 
-## 👨‍🎓 Contexte Académique
+## 👨‍🎓 Academic Context
 
 **Cours**: IOT  
-**Niveau**: [Première année bachelor]  
+**Niveau**: [First-year bachelor]  
 **Établissement**: [IIM-Digital School]  
 **Semestre**: [B1]
 
 ## 📄 Licence
 
-Ce projet est développé dans un cadre académique. Tous droits réservés à l'étudiant.
+This project was developed as part of an academic assignment. All rights reserved to the student.
