@@ -4,8 +4,8 @@ import network
 import socket
 
 # --- Configuration WiFi ---
-SSID = "iPhone de Benjamin" # Nom du WiFi
-PASSWORD = "trouvelemdp" # mdp du WiFi
+SSID = "YOUR_WIFI_NAME" # Nom du WiFi
+PASSWORD = "YOUR_WIFI_PASSWORD" # mdp du WiFi
 
 # --- Capteur ultrason ---
 trigger = Pin(2, Pin.OUT)
