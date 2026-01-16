@@ -3,11 +3,11 @@ import utime
 import network
 import socket
 
-# --- Configuration WiFi ---
-SSID = "YOUR_WIFI_NAME" # Nom du WiFi
-PASSWORD = "YOUR_WIFI_PASSWORD" # mdp du WiFi
+# --- WiFi Configuration---
+SSID = "YOUR_WIFI_NAME" # WiFi name
+PASSWORD = "YOUR_WIFI_PASSWORD" # WiFi password
 
-# --- Capteur ultrason ---
+# --- Ultrasonic sensor ---
 trigger = Pin(2, Pin.OUT)
 echo = Pin(3, Pin.IN)
 
@@ -35,7 +35,7 @@ def color(r, g, b):
     green.duty_u16(65535 if g else 0)
     blue.duty_u16(65535 if b else 0)
 
-# --- Clavier matriciel ---
+# --- Matrix keypad ---
 rows = [Pin(6, Pin.OUT), Pin(7, Pin.OUT), Pin(8, Pin.OUT), Pin(9, Pin.OUT)]
 cols = [Pin(10, Pin.IN, Pin.PULL_DOWN), Pin(11, Pin.IN, Pin.PULL_DOWN),
         Pin(12, Pin.IN, Pin.PULL_DOWN), Pin(13, Pin.IN, Pin.PULL_DOWN)]
@@ -47,21 +47,21 @@ keys = [
     ['*', '0', '#', 'D']
 ]
 
-# --- Paramètres ---
-CODE_CORRECT = "2704"
-code_saisi = ""
-distance_max = 20
-alarme_active = False
+# --- Settings ---
+secret_code = "2704"
+input = ""
+max_distance = 20
+active_alarm = False
 notification = False
 
-# --- Connexion WiFi ---
-def connecter_wifi():
-    """Connecte le Pico au WiFi"""
+# --- WiFi connection ---
+def wifi_connect():
+    """Connect the Pico to WiFi"""
     wlan = network.WLAN(network.STA_IF)
     wlan.active(True)
     wlan.connect(SSID, PASSWORD)
 
-    print("Connexion au WiFi...")
+    print("Connecting to WiFi")
     timeout = 10
     while timeout > 0:
         if wlan.status() < 0 or wlan.status() >= 3:
@@ -71,17 +71,17 @@ def connecter_wifi():
         utime.sleep(1)
 
     if wlan.status() != 3:
-        print("\nEchec de connexion WiFi")
+        print("\nWiFi connection failed")
         return None
     else:
-        print("\nConnecté au WiFi !")
+        print("\nConnected to WiFi")
         status = wlan.ifconfig()
-        print(f"Adresse IP: {status[0]}")
+        print(f"IP address: {status[0]}")
         return wlan
 
-def webpage(distance, distance_max, alarme_active, code_saisi):
-    etat = "Alarme Active !" if alarme_active else "Système OK"
-    couleur = "#ff4444" if alarme_active else "#44ff44"
+def web_page(distance, max_distance, active_alarm, input):
+    etat = "Active alarm!" if active_alarm else "System OK"
+    status_color = "#ff4444" if active_alarm else "#44ff44"
 
     html = f"""<!DOCTYPE HTML>
 <html>
@@ -89,7 +89,7 @@ def webpage(distance, distance_max, alarme_active, code_saisi):
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="refresh" content="2">
-    <title>Alarme - Surveillance</title>
+    <title>Alarm - Monitoring</title>
     <style>
         body {{
             font-family: Arial, sans-serif;
@@ -109,7 +109,7 @@ def webpage(distance, distance_max, alarme_active, code_saisi):
             text-align: center;
         }}
         .status {{
-            background: {couleur};
+            background: {status_color};
             color: white;
             padding: 20px;
             border-radius: 5px;
@@ -136,13 +136,13 @@ def webpage(distance, distance_max, alarme_active, code_saisi):
 </head>
 <body>
     <div class="card">
-        <h1>Système d'Alarme</h1>
+        <h1>Alarm System</h1>
         <div class="status">{etat}</div>
         <div class="info">
-            <p><span class="label">Distance détectée:</span> {distance:.1f} cm</p>
-            <p><span class="label">Seuil d'alerte:</span> {distance_max} cm</p>
-            <p><span class="label">Code saisi:</span> {'*' * code_saisi}</p>
-            <p><span class="label">Code attendu:</span> {len(CODE_CORRECT)} chiffres</p>
+            <p><span class="label">Distance detected:</span> {distance:.1f} cm</p>
+            <p><span class="label">Alert threshold:</span> {max_distance} cm</p>
+            <p><span class="label">Input code:</span> {'*' * input}</p>
+            <p><span class="label">Expected code:</span> {len(secret_code)} digits</p>
         </div>
         <p style="text-align: center; color: #999; margin-top: 20px;"></p>
     </div>
@@ -150,8 +150,8 @@ def webpage(distance, distance_max, alarme_active, code_saisi):
 </html>"""
     return html
 
-# --- Fonctions ---
-def distanceMax():
+# --- Functions ---
+def maxDistance():
     trigger.low()
     utime.sleep_us(2)
     trigger.high()
@@ -172,19 +172,19 @@ def distanceMax():
             return -1
         end_time = utime.ticks_us()
 
-    duree = utime.ticks_diff(end_time, start_time)
-    distance = (duree * 0.0343) / 2
+    timing = utime.ticks_diff(end_time, start_time)
+    distance = (timing * 0.0343) / 2
     return distance
 
-def activer_buzzer():
+def activate_buzzer():
     buzzer.duty_u16(32768)
     print("active_buzzer")
 
-def desactiver_buzzer():
+def deactivate_buzzer():
     buzzer.duty_u16(0)
-    #print("desactiver_buzzer")
+    #print("deactivate_buzzer")
 
-def digiCode():
+def digitCode():
     for i, row in enumerate(rows):
         row.high()
         for j, col in enumerate(cols):
@@ -195,53 +195,53 @@ def digiCode():
         row.low()
     return None
 
-def verifCode():
-    global code_saisi, alarme_active, notification
-    if code_saisi == CODE_CORRECT:
-        print("Code correct ! Alarme désactivée")
-        desactiver_buzzer()
-        alarme_active = False
+def verifyCode():
+    global input, active_alarm, notification
+    if input == secret_code:
+        print("Correct code! Alarm deactivated")
+        deactivate_buzzer()
+        active_alarm = False
         notification = False
-        code_saisi = ""
+        input = ""
         return True
     else:
-        print("Code incorrect !")
-        code_saisi = ""
+        print("Incorrect code!")
+        input = ""
         return False
 
-def gereTouche(touche):
-    global code_saisi
+def readKey(key):
+    global input
 
-    if touche == '#':
-        return verifCode()
+    if key == '#':
+        return verifyCode()
 
-    elif touche == '*':
-        code_saisi = ""
-        print("Code effacé")
+    elif key == '*':
+        input = ""
+        print("Code deleted")
 
     else:
-        code_saisi += touche
-        print("Code: " + "*" * len(code_saisi))
+        input += key
+        print("Code: " + "*" * len(input))
 
-        if len(code_saisi) == 4:
-            return verifCode()
+        if len(input) == 4:
+            return verifyCode()
 
     return False
 
-# --- Programme principal ---
+# --- Main program ---
 print("="*40)
-print("Système d'alarme démarré")
+print("Alarm system started")
 print("="*40)
 
-# Connexion WiFi
-wlan = connecter_wifi()
+# WiFi connection
+wlan = wifi_connect()
 if wlan is None:
-    print("ERREUR: Impossible de continuer sans WiFi")
+    print("ERROR: Cannot proceed without a WiFi connection")
     color(1, 0, 0)
     while True:
         utime.sleep(1)
 
-# Démarrage du server
+# Starting server
 addr = socket.getaddrinfo('0.0.0.0', 80)[0][-1]
 s = socket.socket()
 s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -249,67 +249,67 @@ s.bind(addr)
 s.listen(1)
 s.settimeout(0.2)
 
-print(f"Serveur web démarré sur http://{wlan.ifconfig()[0]}")
-print("Distance max:", distance_max, "cm")
-print("Code PIN:", CODE_CORRECT)
+print(f"Web server started on: http://{wlan.ifconfig()[0]}")
+print("Max distance:", max_distance, "cm")
+print("PIN code:", secret_code)
 print("="*40)
 
 for i in range(10, 0, -1):
-    print(f"Démarrage dans {i} secondes...")
+    print(f"Starting in {i} seconds...")
     utime.sleep(2)
 
-print("\nSysteme d'alarme actif !")
+print("\nAlarm system active!")
 print("="*40)
 
-derniere_touche = None
-temps_derniere_touche = 0
-distance_actuelle = 0
+latest_key = None
+last_key_time = 0
+current_distance = 0
 
-dernier_affichage_client = 0
-delai_affichage = 2000     
+last_client_display = 0
+display_delay = 2000     
 
 
 while True:
-    distance = distanceMax()
+    distance = maxDistance()
 
     if distance != -1:
-        distance_actuelle = distance
+        current_distance = distance
         #print("Distance:", round(distance, 1), "cm")
 
-        # --- Détection d'intrusion ---
-        if distance < distance_max and not alarme_active:
-            print("ALERTE ! Objet détecté !")
-            color(1, 0, 0)       # LED rouge
-            activer_buzzer()     # Buzzer ON
-            alarme_active = True
+        # --- Intrusion detection ---
+        if distance < max_distance and not active_alarm:
+            print("ALERT! Person detected!")
+            color(1, 0, 0)       # Red LED
+            activate_buzzer()     # Buzzer ON
+            active_alarm = True
             notification = True
 
-        # --- Si alarme active : digicode ---
-        if alarme_active:
-            touche = digiCode()
-            temps_actuel = utime.ticks_ms()
+        # --- If alarm is active: digit code ---
+        if active_alarm:
+            key = digitCode()
+            current_time = utime.ticks_ms()
 
-            if touche and (touche != derniere_touche or utime.ticks_diff(temps_actuel, temps_derniere_touche) > 300):
-                print("Touche pressée:", touche)
-                gereTouche(touche)
-                derniere_touche = touche
-                temps_derniere_touche = temps_actuel
+            if key and (key != latest_key or utime.ticks_diff(current_time, last_key_time) > 300):
+                print("Key pressed:", key)
+                readKey(key)
+                latest_key = key
+                last_key_time = current_time
 
-        # --- Si pas d'intrusion et alarme inactive ---
-        if not alarme_active and distance >= distance_max:
-            color(0, 1, 0)       # LED verte
-            desactiver_buzzer()
+        # --- If no intrusion AND alarm is inactive ---
+        if not active_alarm and distance >= max_distance:
+            color(0, 1, 0)       # Green LED
+            deactivate_buzzer()
             notification = False
 
     try:
         client, addr_client = s.accept()
-        temps = utime.ticks_ms()
-        if utime.ticks_diff(temps, dernier_affichage_client) > delai_affichage:
-            print(f"Client connecté depuis {addr_client}")
-            dernier_affichage_client = temps
+        time = utime.ticks_ms()
+        if utime.ticks_diff(time, last_client_display) > display_delay:
+            print(f"Client connected from {addr_client}")
+            last_client_display = time
         request = client.recv(1024)
         
-        response = webpage(distance_actuelle, distance_max, alarme_active, len(code_saisi))
+        response = web_page(current_distance, max_distance, active_alarm, len(input))
         http_response = 'HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nConnection: close\r\n\r\n' + response
         client.send(http_response)
         client.close()
