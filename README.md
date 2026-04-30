@@ -96,10 +96,10 @@ import socket                  # HTTP web server
 
 ```bash
 # Clone the repository
-git clone git@github.com:Ne0xa/Motion-Guardian.git
+git clone git@github.com:Ne0xa/IIM-B1-Motion-Guardian.git
 
 # Navigate to the project folder
-cd Motion-Guardian
+cd IIM-B1-Motion-Guardian
 ```
 
 ### Configuration
@@ -167,7 +167,7 @@ The interface shows the current alarm status (ON/OFF).
 - ✅ Automatic reset after validation
 - ✅ Key debouncing
 
-⚠️ **Important** : Change the default PIN code (2704) before using the system in real situations
+⚠️ **Important** : Change the default PIN code (1234) before using the system in real situations
 
 ## 🛠️ Customization
 
