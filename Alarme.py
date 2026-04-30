@@ -48,7 +48,7 @@ keys = [
 ]
 
 # --- Settings ---
-secret_code = "2704"
+secret_code = "1234"
 input = ""
 max_distance = 20
 active_alarm = False
